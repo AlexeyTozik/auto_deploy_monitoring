@@ -2,7 +2,9 @@ from flask import Flask, request, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///tasks.db'
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///tasks.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
 db = SQLAlchemy(app)
 
 class Task(db.Model):
@@ -10,7 +12,7 @@ class Task(db.Model):
     title = db.Column(db.String(100), nullable=False)
 
     def __repr__(self):
-        return f'<Task {self.title}>'
+        return f"Task {self.id}: {self.title}"
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -40,5 +42,7 @@ def delete(id):
     except:
         return 'Ошибка удаления задачи'
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    with app.app_context():
+        db.create_all()
+    app.run(host="0.0.0.0", port=5000)
